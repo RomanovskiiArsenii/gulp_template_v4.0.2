@@ -1,0 +1,341 @@
+GULP - это Task Runner
+
+Установка:
+
+Перетащить новую папку в пространство VS Code
+Cнизу потянуть вверх консоль и выбрать консоль Gitbash
+
+В консоли $ npm init, затем enter пока не будет вопрос is this ok - ответить y
+Будет создан файл package.json
+
+Для установки GULP глобально требуется предварительно установить NODE и GIT
+Установка Gulp (делается один раз в системе):
+Для установки gulp 
+В консоли $ npm i gulp-cli -g
+Для удаления gulp
+$ npm rm --global gulp
+Для проверки версии gulp
+$ gulp -v
+
+Для установки GULP версии 4.0.2 локально:
+В консоли $ npm install gulp@4.0.2 --save-dev
+В package.json будут добавлены зависимости - чтобы локальная версия gulp 
+не отличалась от глобальной
+Появиться папка node_modules и файл package-lock
+
+В корневом каталоге создаем файл gulpfile.js
+В корневом каталоге создаем папки app и dist
+app - это структура сайта черновая
+dist - это окончательная структура для залития на хостинг
+
+Создание структуры сайта (пример):
+в app создаем папку scss c файлом style.scss
+в app создаем папку js с файлом main.js
+в app создаем папку images
+в app создаем файл index.html
+
+в файле index подключаем пока не существующий файл стиля:
+<link rel="stylesheet" href="css/style.min.css">
+и скрипт:
+<script src="js/main.js"></script>
+
+Создание задачи в файле gulpfile.js
+Создаем две константы:
+const{src, dest} = require('gulp');
+теперь они могут пользоваться возможностями gulp
+
+Настраиваем конвертация из препроцессора.
+Для этого требуется установка двух плагинов.
+В консоли $ npm i gulp-sass@5.1.0 sass@1.58.3 -D
+Подключенные плагины будут отображены в package
+Создание задачи в файле gulpfile.js
+создаем константу:
+const scss = require('gulp-sass')(require ('sass'));
+теперь константа может пользоваться возхможностями плагинов
+создаем функцию:
+function styles() {
+    //файл SCSS обработать, отправить в папку app/css
+    return src('app/scss/style.scss')
+        .pipe(scss({ outputStyle: 'compressed' }))  //сжать css
+        .pipe(dest('app/css'));                     //сохранить по пути 
+}
+и экспортируем ее:
+exports.styles = styles; 
+сохраняем и в консоли пишем
+gulp styles (где styles - название функции)
+Получен файл css
+
+Теперь, чтобы переименовать файл css, добавляем плагин gulp-concat
+В консоли $ npm i gulp-concat@2.6.1 -D
+Создание задачи в файле gulpfile.js:
+создаем константу
+const concat = require('gulp-concat');
+и в функцию styles добавляем еще одно звено:
+function styles() {
+    //файл SCSS обработать, переименовать, сжать отправить в папку app/css
+    return src('app/scss/style.scss')       //файл scss - источник
+        .pipe(concat('style.min.css'))      //объединение файлов, переименование конечного файла
+        .pipe(scss({ outputStyle: 'compressed' })) //конвертировать в scss и сжать
+        .pipe(dest('app/css'));             //сохранить в файл
+}
+
+Чтобы объединять js файлы у нас есть плагин gulp-concat, теперь
+чтобы сжать файлы js, нужно установить gulp-uglify-es
+В консоли $ npm i gulp-uglify-es@3.0.0 -D
+Задача:
+добавляем константу
+const uglify = require('gulp-uglify-es').default;
+добавляем функцию
+function scripts() {
+    return src('app/js/main.js')     //файл js
+        .pipe(concat('main.min.js')) //объединение файлов,переименование конечного файла
+        .pipe(uglify())              //сжать
+        .pipe(dest('app/js'));       //сохранить в файл
+}
+экспортируем 
+exports.scripts = scripts;
+в консоли $ gulp scripts
+получаем сжатый файл js
+
+Далее, чтобы автоматически срабатывали функции, нужно подключить watch
+изменяем константу
+const { src, dest } = require('gulp');
+добавляем функцию
+function watching() {
+    // в случае изменения файла - запустить функцию
+    watch(['app/scss/style.scss'], styles);    
+    watch(['app/js/main.js'], scripts);
+}
+экспортируем:
+exports.watching = watching;
+в консоли $ gulp watching
+теперь watcher следит за изменениями и применяем скрипты автоматически
+чтобы остановить watcher, в консоли ctr c
+
+Далее, чтобы страница обновлялась автоматически, нужно установить плагин
+browser-sync
+В консоли $ npm i browser-sync@2.28.1 -D
+добавляем константу
+const browserSync = require('browser-sync').create;
+добавляем функцию
+function browsersync() {
+    browserSync.init({
+        server: {
+            baseDir: 'app/',
+        },
+    });
+}
+экспортируем
+exports.browsersync = browsersync;
+в функции scripts и styles добавляем строку
+.pipe(browserSync.stream()); //обновить страницу
+настраиваем обновление страницы при изменении html,
+для этого в watcher добавляем строку
+function watching() {
+    watch(['app/scss/style.scss'], styles);
+    watch(['app/js/main.js'], scripts);
+    watch(['app/*.html']).on('change', browserSync.reload);     //при изменении любого html - обновить страницу
+}
+если файлы html также находятся в папках, следует указать путь:
+watch(['app/**/*.html']).on('change', browserSync.reload);  
+
+Далее, чтобы все запустить параллельно, требуется добавить parallel:
+const { src, dest, watch, parallel } = require('gulp');
+и экспортировать при помощи него все скрипты 
+exports.default = parallel(scripts, styles, browsersync, watching);
+в консоли $ gulp
+
+Чтобы добавить автоматическое добавление вендорных префиксов
+в консоли $ npm i gulp-autoprefixer@8.0.0 -D 
+и $ npm i gulp-postcss -D
+добавляем константы
+const autoprefixer = require('autoprefixer');
+const postcss = require('gulp-postcss');
+и в функцию styles добавляем строку
+function styles() {
+    //файл SCSS обработать, переименовать, сжать отправить в папку app/css
+    return src('app/scss/style.scss') //файл scss - источник
+        .pipe(scss({ outputStyle: 'compressed' })) //конвертировать в scss и сжать
+        .pipe(postcss([autoprefixer({ overrideBrowserslist: ['last 10 version'] })])) // Использование postcss с autoprefixer
+        .pipe(concat('style.min.css')) //объединение файлов, переименование конечного файла
+        .pipe(dest('app/css')) //сохранить в файл
+        .pipe(browserSync.stream()); //обновить страницу
+}
+
+Если требуется указать несколько источников в src, разделяем их запятой
+и ставим квадратные скобки
+return src(['app/js/main.js', 'app/js/some.js']) 
+если требуется исключить файл - ставим восклицательный знак перед адресом
+ '!app/js/some.js'
+ 
+ ! - кроме
+ *.js - все файлы js
+ ** - все папки
+ *.* - все файлы
+
+Чтобы собрать build пишем функцию:
+function build() {
+    //собираем все файлы в конечную сборку, base - файловая структура как в паке app
+    return src(['app/css/style.min.css', 'app/js/main.min.js', 'app/**/*.html'], { base: 'app' }).pipe(dest('dist'));
+}
+экспортируем
+exports.building = building;
+
+Для того, чтобы при сборке билда старый удалялся, нужно установить пакет clean
+$ npm i gulp-clean@0.4.0 -D
+добавляем series
+const { src, dest, watch, parallel, series } = require('gulp');
+добавляем константу
+const clean = require('gulp-clean');
+добавляем функцию
+function cleanDist() {
+    return src('dist').pipe(clean());
+}
+экспортируем
+exports.build = series(cleanDist, building);
+
+Совершенствование сборки:
+Перенос browsersync метода в watching
+function watching() {
+        browserSync.init({
+        server: {
+            baseDir: 'app/', //корневой каталог
+        },
+    });
+    watch(['app/scss/style.scss'], styles); //при изменении файла scss
+    watch(['app/js/main.js'], scripts); //при изменении файла js
+    watch(['app/*.html']).on('change', browserSync.reload); //при изменении любого html - обновить страницу
+}
+и удаляем его из default и экспорта
+exports.default = parallel(styles, scripts, watching);
+
+Конвертация изображений:
+в папке images создаем папку src
+в консоли $ npm i gulp-avif@1.1.1 gulp-webp@4.0.1 gulp-imagemin@7.1.0 --save-dev
+добавляем константы:
+const avif = require('gulp-avif');
+const webp = require('gulp-webp');
+const imagemin = require('gulp-imagemin');
+добавляем функцию
+function images() {
+    return src(['app/images/src/*.*', '!app/images/src/*.svg']) //выбрать изображения, исключив svg
+        .pipe(avif({ quality: 50 })) //конвертировать исходные изображения
+
+        .pipe(src('app/images/src/*.*'))
+        .pipe(webp()) //конвертировать исходные изображения
+
+        .pipe(src('app/images/src/*.*'))
+        .pipe(imagemin({ verbose: true })) //сжать исходные изображения, логгировать
+
+        .pipe(dest('app/images/dist')); //сохранить сжатые изображения в директории
+}
+экспортируем
+exports.images = images;
+
+Чтобы изображения не сжимались и не конвертировались повторно:
+в консоли $ npm i gulp-newer@1.4.0 --save-dev
+добавляем константу
+const newer = require('gulp-newer');
+в функции сжатия и конвертации изображений после src добавить строку:
+function images() {
+    return src(['app/images/src/*.*', '!app/images/src/*.svg']) //выбрать изображения, исключив svg
+        .pipe(newer('app/images/dist')) //выбрать только новые изображения
+        .pipe(avif({ quality: 50 })) //конвертировать исходные изображения
+
+        .pipe(src('app/images/src/*.*'))
+        .pipe(newer('app/images/dist')) //выбрать только новые изображения
+        .pipe(webp()) //конвертировать исходные изображения
+
+        .pipe(src('app/images/src/*.*'))
+        .pipe(newer('app/images/dist')) //выбрать только новые изображения
+        .pipe(imagemin({ verbose: true })) //сжать исходные изображения, логгировать
+
+        .pipe(dest('app/images/dist')); //сохранить сжатые изображения в директории
+}
+добавляем watch
+watch(['app/images/src'], images); //вызов функции images при изменении содержимого паки images
+
+
+Для конвертации SVG в спрайт
+в консоли $ npm install --save-dev gulp-svg-sprite@2.0.3
+добавляем константу
+const svgSprite = require('gulp-svg-sprite');
+добавляем функцию
+function sprite() {
+    return src('app/images/dist/*.svg') //выбрать файлы svg
+        .pipe(
+            svgSprite({
+                mode: {
+                    stack: {
+                        sprite: '../sprite.svg',
+                        example: true,
+                    },
+                },
+            })
+        )
+        .pipe(dest('app/images/dist')); //сохранить с заменой
+}
+экспортируем
+exports.sprite = sprite;
+добавляем спрайт и исключаем svg из билда
+function building() {
+    //собираем все файлы в конечную сборку, base - файловая структура как в паке app
+    return src(
+        [
+            'app/css/style.min.css',
+            'app/images/dist/*.*',
+            '!app/images/dist/*.svg',
+            'app/images/dist/sprite.svg',
+            'app/js/main.min.js',
+            'app/**/*.html',
+        ],
+        {
+            base: 'app',
+        }
+    ).pipe(dest('dist'));
+}
+
+Конвертация шрифтов
+в консоли & npm i gulp-fonter@0.3.0 gulp-ttf2woff2@4.0.1 --save-dev
+создаем папку app/fonts/src
+добавляем константы
+const fonter = require('gulp-fonter');
+const ttf2woff2 = require('gulp-ttf2woff2');
+добавляем функцию
+function fonts() {
+    //конвертировать шрифты
+    return src('app/fonts/src/*.*')
+        .pipe(
+            fonter({
+                formats: ['woff', 'ttf'],
+            })
+        )
+        .pipe(src('app/fonts/*.ttf'))
+        .pipe(ttf2woff2())
+        .pipe(dest('app/fonts')); //выложить в fonts
+}
+экспортируем
+exports.fonts = fonts;
+добавляем шрифты в билд 
+function building() {
+    //собираем все файлы в конечную сборку, base - файловая структура как в паке app
+    return src(
+        [
+            'app/css/style.min.css',
+            'app/images/dist/*.*',
+            '!app/images/dist/*.svg',
+            'app/images/dist/sprite.svg',
+            'app/fonts/*.*',
+            'app/js/main.min.js',
+            'app/**/*.html',
+        ],
+        {
+            base: 'app',
+        }
+    ).pipe(dest('dist'));
+}
+
+Улучшение сборки:
+исключение папок dist из функций fonts images building
+добавленние пакета gulp-ignore
+ручной запрет на svg файлы в функции images при помощи ignore
