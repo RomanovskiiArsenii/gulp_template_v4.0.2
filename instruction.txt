@@ -339,3 +339,19 @@ function building() {
 исключение папок dist из функций fonts images building
 добавленние пакета gulp-ignore
 ручной запрет на svg файлы в функции images при помощи ignore
+
+Работа с PUG
+Установка: 
+$ npm i pug -g (глобально)
+$ npm i gulp-pug --save-dev 
+создаем директорию app/pug c файлом test.pug
+добавляем константу
+const pug = require('gulp-pug');
+добавляем функцию
+function pugConvert() {
+    return src('app/pug/*.pug')
+        .pipe(pug({ pretty: true })) //конвертация в html, pretty - стилизация
+        .pipe(dest('app'));
+}
+добавляем watch
+watch(['app/pug/*.pug'], pugConvert); //вызов функции pugConvert при изменении содержимого папки app/pug

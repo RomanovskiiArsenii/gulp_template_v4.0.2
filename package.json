@@ -20,6 +20,7 @@
     "gulp-imagemin": "^7.1.0",
     "gulp-newer": "^1.4.0",
     "gulp-postcss": "^10.0.0",
+    "gulp-pug": "^5.0.0",
     "gulp-sass": "^5.1.0",
     "gulp-svg-sprite": "^2.0.3",
     "gulp-ttf2woff2": "^4.0.1",
@@ -28,6 +29,9 @@
     "sass": "^1.58.3"
   },
   "dependencies": {
-    "gulp-match": "^1.1.0"
+    "-": "^0.0.1",
+    "g": "^2.0.1",
+    "gulp-match": "^1.1.0",
+    "pug": "^3.0.2"
   }
 }
