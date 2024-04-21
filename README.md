@@ -4,22 +4,22 @@
 
 Установка:
 
-$ npm init (enter до вопроса "is this ok?" отвечаем y)
-$ npm i gulp-cli -g (глобально, если не установлен)
-$ npm install gulp@4.0.2 --save-dev
+npm init (enter до вопроса "is this ok?" отвечаем y)
+npm i gulp-cli -g (глобально, если не установлен)
+npm install gulp@4.0.2 --save-dev
 
--   В корневом каталоге создаем папки app и dist
-    $ npm i gulp-sass@5.1.0 sass@1.58.3 -D
-    $ npm i gulp-concat@2.6.1 -D
-    $ npm i gulp-uglify-es@3.0.0 -D
-    $ npm i browser-sync@2.28.1 -D
-    $ npm i gulp-autoprefixer@8.0.0 -D
-    $ npm i gulp-postcss -D
-    $ npm i gulp-clean@0.4.0 -D
-    $ npm i gulp-avif@1.1.1 gulp-webp@4.0.1 gulp-imagemin@7.1.0 --save-dev
-    $ npm i gulp-newer@1.4.0 --save-dev
-    $ npm install --save-dev gulp-svg-sprite@2.0.3
-    $ npm install gulp-ignore@3.0.0 --save-dev
+В корневом каталоге создаем папки app и dist
+npm i gulp-sass@5.1.0 sass@1.58.3 -D
+npm i gulp-concat@2.6.1 -D
+npm i gulp-uglify-es@3.0.0 -D
+npm i browser-sync@2.28.1 -D
+npm i gulp-autoprefixer@8.0.0 -D
+npm i gulp-postcss -D
+npm i gulp-clean@0.4.0 -D
+npm i gulp-avif@1.1.1 gulp-webp@4.0.1 gulp-imagemin@7.1.0 --save-dev
+npm i gulp-newer@1.4.0 --save-dev
+npm install --save-dev gulp-svg-sprite@2.0.3
+npm install gulp-ignore@3.0.0 --save-dev
 
 Включает в себя:
 
