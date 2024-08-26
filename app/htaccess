@@ -1,0 +1,28 @@
+# Error Document
+ErrorDocument 404 /404.html
+
+# Redirects
+RewriteEngine On
+
+# Перенаправление с www на без www и с http на https  
+RewriteCond %{HTTP_HOST} ^www\.bellevue\.ru [NC,OR]
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://bellevue.ru%{REQUEST_URI} [L,R=301]
+
+# Кеширование изображений
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    ExpiresByType application/xhtml+xml "access plus 1 year"   # Для sprite.html
+    ExpiresByType image/svg+xml "access plus 1 year"          # Для sprite.svg
+</IfModule>
+
+# PHP Handler (cPanel generated, do not edit)
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php73 .php .php7 .phtml
+</IfModule>

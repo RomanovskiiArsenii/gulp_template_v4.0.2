@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /fonts/
+Disallow: /js/
+Disallow: /css/
+Disallow: /json/
+
+Sitemap: https://lotusmart.ru/sitemap.xml

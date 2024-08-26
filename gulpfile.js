@@ -27,14 +27,6 @@ const fonter = require('gulp-fonter');
 const ttf2woff2 = require('gulp-ttf2woff2');
 // подключаем плагин для исключения файлов из потока
 const ignore = require('gulp-ignore');
-//подключаем pug
-const pug = require('gulp-pug');
-
-function pugConvert() {
-    return src('app/pug/*.pug')
-        .pipe(pug({ pretty: true })) //конвертация в html, pretty - стилизация
-        .pipe(dest('app'));
-}
 
 function fonts() {
     //выбрать все шрифты
@@ -114,7 +106,7 @@ function watching() {
     watch(['app/images/src'], images); //вызов функции images при изменении содержимого папки images/src
     watch(['app/fonts/src'], fonts); //вызов функции fonts при изменении содержимого папки fonts/src
     watch(['app/*.html']).on('change', browserSync.reload); //вызов функции browsersync при изменении любого html
-    watch(['app/pug/*.pug'], pugConvert); //вызов функции pugConvert при изменении содержимого папки app/pug
+    watch(['app/json/*.json']).on('change', browserSync.reload); //вызов функции browsersync при изменении любого html
 }
 
 function cleanDist() {
@@ -133,7 +125,10 @@ function building() {
             'app/fonts/*.*',
             'app/js/main.min.js',
             'app/**/*.html',
-            'app/pug/*.html',
+            'app/json/*.json',
+            'app/sitemap.xml',
+            'app/robots.txt',
+            'app/htaccess',
         ],
         {
             base: 'app',
