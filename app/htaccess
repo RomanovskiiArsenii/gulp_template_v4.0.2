@@ -5,9 +5,9 @@ ErrorDocument 404 /404.html
 RewriteEngine On
 
 # Перенаправление с www на без www и с http на https  
-RewriteCond %{HTTP_HOST} ^www\.bellevue\.ru [NC,OR]
+RewriteCond %{HTTP_HOST} ^www\.yoursite\.ru [NC,OR]
 RewriteCond %{HTTPS} off
-RewriteRule ^ https://bellevue.ru%{REQUEST_URI} [L,R=301]
+RewriteRule ^ https://yoursite.ru%{REQUEST_URI} [L,R=301]
 
 # Кеширование изображений
 <IfModule mod_expires.c>
@@ -18,11 +18,6 @@ RewriteRule ^ https://bellevue.ru%{REQUEST_URI} [L,R=301]
     ExpiresByType image/webp "access plus 1 year"
     ExpiresByType image/svg+xml "access plus 1 year"
     ExpiresByType image/x-icon "access plus 1 year"
-    ExpiresByType application/xhtml+xml "access plus 1 year"   # Для sprite.html
-    ExpiresByType image/svg+xml "access plus 1 year"          # Для sprite.svg
-</IfModule>
-
-# PHP Handler (cPanel generated, do not edit)
-<IfModule mime_module>
-  AddHandler application/x-httpd-ea-php73 .php .php7 .phtml
+    ExpiresByType application/xhtml+xml "access plus 1 year" 
+    ExpiresByType image/svg+xml "access plus 1 year"          
 </IfModule>
